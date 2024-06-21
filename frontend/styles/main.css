@@ -1,0 +1,541 @@
+/* *****************************************************************************
+**************************** VALORES POR DEFAULT *******************************
+**************************** MOBILE FIRST DESIGN *******************************
+*******************************************************************************/
+
+:root {
+    --link: #BB5555;
+    --table--default-border: #000000;
+    --paragraph--advice-bg: #FF8C89;
+    --paragraph--inf-bg: #0099CC;
+    --paragraph--ok-bg: #00CC00;
+    --paragraph--war-bg: #FFFF00;
+    --paragraph--eme-bg: #664499;
+    --paragraph--prc-bg: #FF9900;
+    --paragraph--err-bg: #FF3300;
+    --paragraph--cat-bg: #CC0000;
+    --button--process-bg: #009900;
+    --button--process-text: #FFFFFF;
+    --button--deprocess-bg: #0000AA;
+    --button--deprocess-text: #FFFFFF;
+    --profile-area--text: #773300;
+    --profile-area--link: #003377;
+    --menu--text: #FEFEFE;
+    --menu--hover: #000000;
+    --menu--bg: #505050;
+    --basic-tabs--text: #773300;
+    --basic-tabs--hover: #DDDDDD;
+    --basic-tabs--bg: #FFFFFF;
+    --basic-tabs--current-bg: #BBBBBB;
+    --copyright-area--bg: #505050;
+    --copyright-area--text: #FEFEFE;
+    --preliminary_form--bg: #FFF0F0;
+    --main_form--bg: #B0F0FF;
+    --details_form--bg: #F0FFF0;
+    --form-element_message--error: #FF0000;
+    --error_box--bg: #A0A0A0;
+    --error_box--text: #990000;
+    --info_box--bg: #DADADA;
+    --info_box--text: #255594;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 14px;
+}
+
+body {
+    font-family: tahoma;
+    font-size: 0.8rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+    margin: 0.4rem;
+}
+
+h1, h2, h3 {
+    font-weight: bold;
+}
+
+h1, h4 {
+	font-size: 1.1rem;
+}
+
+h2, h5 {
+    font-size: 1rem;
+}
+
+h3, h6 {
+    font-size: 0.9rem;
+}
+
+ul {
+    padding: 0.2rem 1rem;
+    margin: 0.2rem;
+}
+
+li {
+    margin: 0.2rem 0;
+}
+
+p {
+    margin: 0.2rem;
+    padding: 0.2rem;
+}
+
+a {
+    white-space: nowrap;
+    color: var(--link);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+hr {
+    color: var(--menu--bg);
+    width: 98%;
+    margin: 0 auto;
+}
+
+form {
+    max-width: 1280px;
+    margin: 0.4em auto;
+}
+
+fieldset {
+    max-width: 920px;
+    margin: 0.2em auto;
+    padding: 0.2em;
+}
+
+fieldset * {
+    max-width: 92vw;
+    margin: 0.3em 0.2em;
+}
+
+button, legend, label, input[type=submit], input[type=button] {
+    font-weight: bold;
+    margin: 0.2rem;
+}
+
+label {
+    display: block;
+    text-align: left;
+}
+
+textarea {
+    padding: 0.4em;
+    resize: none;
+    margin-bottom: 0;
+}
+
+table {
+    margin: 0.3em auto;
+}
+
+table, tr, th, td  {
+    border-bottom: 1px solid var(--table--default-border);
+    border-collapse: collapse;
+    padding: 0.2em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* HTML5_BODY_CONTAINER ----------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+#container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* -------------------------------------------------------------------------- */
+/* HTML5_BODY_CONTAINER_HEADER ---------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+header {
+    display: block;
+    margin: 0 0.4em;
+}
+
+#main_logo {
+    text-align: left;
+}
+
+#main_logo img {
+    margin: 0px auto;
+    height: 80px;
+    width: auto;
+}
+
+#mainNavigation {
+    margin: 1em 0;
+    width: 100%;
+}
+
+#menu {
+    text-align: center;
+    list-style: none; 
+    padding: 0; /* Necessary to remove bullet point space */
+}
+
+#menu li {
+    display: block;
+    background: var(--menu--bg);
+    padding: 0.2em;
+    margin: 0.2em 0;
+}
+
+#menu li a {
+    color: var(--menu--text);
+    text-decoration: none;
+}
+
+#menu li:hover {
+    background: var(--menu--hover);
+}
+
+/* -------------------------------------------------------------------------- */
+/* HTML5_BODY_CONTAINER_MAIN ------------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+
+main {
+    display: block;
+    margin: 0 0.4em;
+}
+
+#mainUI {
+    display: none;
+}
+
+.error_box {
+    text-align: justify;
+    background-color: var(--error_box--bg);
+    color: var(--error_box--text);
+    border: 0.2em solid var(--error_box--text);
+}
+
+.info_box {
+    text-align: justify;
+    background-color: var(--info_box--bg);
+    color: var(--info_box--text);
+    border: 0.2em solid var(--info_box--text);
+}
+
+/* FORM ELEMENTS *************************************************************/
+
+fieldset > section {
+    display: block;
+    clear: both;
+}
+fieldset > section > * {
+    display: block;
+    clear: both;
+}
+
+/* Delimitar márgenes para los renglones dentro de los formularios --------- */
+/* .preliminary_form {
+    background-color: var(--preliminary_form--bg);
+}
+
+.main_form {
+    background-color: var(--main_form--bg);
+}
+
+.details_form {
+    background-color: var(--details_form--bg);
+}
+
+.renglon_relleno_vista_escritorio {
+    display: none;
+}
+
+.form_row {
+    margin: 0.3em 0.2em;
+    clear: both;
+}
+
+.form_row > div {
+    display: block;
+    margin: 0.2em 0em;
+}
+
+.form_row > div.form_column {
+    display: inline-block;
+    min-width: 90px;
+    max-width: 180px;
+    margin: 0.2em 0em;
+}
+
+.form-element_message {
+    color: var(--form-element_message--error);
+}
+*/
+
+/* Rich-Text editor content viewer *******************************************/
+#visor {
+    display: none;
+    border: 0.5em solid #AAAAAA;
+    margin: 0.4em 0 0.4em 0;
+    padding: 0.4em 0 0.4em 0.8em;
+}
+
+/* IMAGE ELEMENTS ****************************************************** */
+#mainImageSection {
+    border-style: dotted;
+}
+
+#mainImage {
+    width: 250px;
+    height: 250px;
+}
+
+#extraImageThumbnailCollection {
+    display: block;
+    /* clear: both; */
+}
+
+.extraImage {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* HTML5_BODY_CONTAINER_FOOTER ---------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+footer {
+    display: block;
+    margin: 0 0.4em;
+}
+
+#sessionArea {
+    margin: 0 0.4em;
+}
+
+#loginForm, #sessionInfo, #adminArea {
+    display: none;
+}
+
+.session_paragraph {
+  color: var(--profile-area--text);
+}
+
+.session_paragraph a:link, .session_paragraph a:visited {
+  color: var(--profile-area--link);
+  text-decoration: none;
+}
+
+.session_paragraph a:hover {
+  text-decoration: underline;
+}
+
+#copyright {
+  text-align: center;
+  background: var(--copyright-area--bg);
+}
+
+#copyright span {
+  font-size: 0.8em;
+  font-weight: bold;
+  color: var(--copyright-area--text);
+}
+
+/* ------------------------------------------------------------------------- */
+
+/* Capsule to delimit table or editor area view ******************************/
+.table_container, .editor_container {
+    display: block;
+    width: 100%;
+    overflow: auto;
+}
+
+/* ------------------------------------------------------------------------- */
+
+/* ######################################################################### */
+/* ################################# TABS BAR ############################## */
+/* ######################################################################### */
+/* #nav_horizontal {
+    margin-top: 0.5em;
+    width: 100%;
+}
+
+#pestanas {
+    text-align: center;
+    list-style: none; 
+    padding: 0;
+}
+
+#pestanas li {
+    display: inline-block;
+    background: var(--basic-tabs--bg);
+    padding: 0.2em;
+    margin: 0.2em 0;
+    border-style: solid solid none solid;
+    border-width: thin;
+}
+
+#pestanas li.pestana_actual {
+    background: var(--basic-tabs--current-bg);
+}
+
+#pestanas li a {
+    color: var(--basic-tabs--text);
+    text-decoration: none;
+}
+
+#pestanas li:hover {
+    background: var(--basic-tabs--hover);
+} */
+/* ######################################################################### */
+
+/*--------------------------------------------------------------------------- */
+/* PERSONALIZED CLASSES AND IDENTIFIERS ------------------------------------- */
+/*--------------------------------------------------------------------------- */
+
+/*--------------------------------------------------------------------------- */
+/* MESSAGES ----------------------------------------------------------------- */
+/*--------------------------------------------------------------------------- */
+.advise {
+    /* color: #000000; */
+    background: var(--paragraph--advice-bg);
+}
+
+.nullMessage {
+    display: none;
+}
+
+.infoMessage {
+    /* color: #000000; */
+    background: var(--paragraph--inf-bg);
+}
+
+.okMessage {
+    /* color: #000000; */
+    background: var(--paragraph--ok-bg);
+}
+
+.warningMessage {
+    /* color: #000000; */
+    background: var(--paragraph--war-bg);
+}
+
+.emergencyMessage {
+    /* color: #000000; */
+    background: var(--paragraph--eme-bg);
+}
+
+.precautionMessage {
+    /* color: #000000; */
+    background: var(--paragraph--prc-bg);
+}
+
+.errorMessage {
+    /* color: #000000; */
+    background: var(--paragraph--err-bg);
+}
+
+.catastropheMessage {
+    color: #FFFFFF;
+    background: var(--paragraph--cat-bg);
+}
+/*--------------------------------------------------------------------------- */
+
+/* Delimita un renglón como bloque 
+.reng-bloque {
+    display: block;
+    margin: 0.2em 0;
+    border: 0;
+}
+*/
+/* Centra elementos. Si son inline los convierte a block. 
+.centrado-bloque {
+    display: block;
+    text-align: center;
+}
+*/
+/* Justifica el texto de un elemento container 
+.texto-justificado {
+    text-align: justify;
+}
+*/
+/*
+.alineado_derecha {
+    text-align: right;
+}
+*/
+/* Botones de procesamiento 
+.boton_procesar {
+    background-color: var(--button--process-bg);
+    color: var(--button--process-text);
+    width: 50vh;
+    padding: 0.3em 0;
+    border-radius: 1em;
+}
+
+.boton_desprocesar {
+    background-color: var(--button--deprocess-bg);
+    color: var(--button--deprocess-text);
+    width: 50vh;
+    padding: 0.3em 0;
+    border-radius: 1em;
+}
+*/
+/* ######################################################################### */
+
+/* *****************************************************************************
+******************************** MEDIA QUERYS **********************************
+*******************************************************************************/
+
+/* MOBILE LANDSCAPE, SMALL TABLET PORTRAIT ************************************/
+@media screen and (min-width: 440px) {
+    .form_row > div {
+        display: inline-block;
+    }
+}
+
+/* MEDIUM TABLET PORTRAIT, SMALL TABLET LANDSCAPE *****************************/
+@media screen and (min-width: 560px) {
+    html {font-size: 1.1em;}
+}
+
+/* MEDIUM TABLET LANDSCAPE, LARGE TABLET PORTRAIT *****************************/
+@media screen and (min-width: 680px) {
+}
+
+/* DESKTOP SMALL **************************************************************/
+@media screen and (min-width: 800px) {
+  
+    html {font-size: 1.2em;}
+    
+    #menu li {
+        display: inline-block;
+        width: 8em;
+        padding: 0.2em;
+    }
+
+    fieldset > section {
+        display: inline-block;
+        vertical-align: top;
+    }
+}
+
+/* DESKTOP NORMAL *************************************************************/
+@media screen and (min-width: 920px) {
+    /* .renglon_relleno_vista_escritorio {
+        display: block;
+    } */
+}
+
+/* DESKTOP LARGE *************************************************************/
+@media screen and (min-width: 1280px) {
+    html {font-size: 1.3em;}
+}
