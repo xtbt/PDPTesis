@@ -3,7 +3,7 @@
     require_once( './Controllers/APIController.php' );
     require_once( './Models/Patient.php' );
     
-    // USER CONTROLLER
+    // PATIENT CONTROLLER
     class PatientController extends APIController {
 
         private $requestMethod = NULL;
@@ -101,15 +101,14 @@
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $Patientname = $this->requestBody['data']['Patientname'];
-            $Password = $this->requestBody['data']['Password'];
-            $Email = isset($this->requestBody['data']['Email']) ? $this->requestBody['data']['Email'] : NULL;
-            $PhoneNumber = isset($this->requestBody['data']['PhoneNumber']) ? $this->requestBody['data']['PhoneNumber'] : NULL;
-            $FirstName = $this->requestBody['data']['FirstName'];
-            $LastName = $this->requestBody['data']['LastName'];
-            $AreaId = $this->requestBody['data']['AreaId'];
+            $PatientAffiliationId = isset($this->requestBody['data']['PatientAffiliationId']) ? $this->requestBody['data']['PatientAffiliationId'] : NULL;
+            $PatientFirstName = isset($this->requestBody['data']['PatientFirstName']) ? $this->requestBody['data']['PatientFirstName'] : NULL;
+            $PatientLastName = isset($this->requestBody['data']['PatientLastName']) ? $this->requestBody['data']['PatientLastName'] : NULL;
+            $PatientBirthDate = $this->requestBody['data']['PatientBirthDate'];
+            $PatientBloodType = isset($this->requestBody['data']['PatientBloodType']) ? $this->requestBody['data']['PatientBloodType'] : NULL;
+            $PatientObservations = isset($this->requestBody['data']['PatientObservations']) ? $this->requestBody['data']['PatientObservations'] : NULL;
 
-            $result = $this->resourceObject->createPatient( $Patientname, $Password, $Email, $PhoneNumber, $FirstName, $LastName, $AreaId );
+            $result = $this->resourceObject->createPatient( $PatientAffiliationId, $PatientFirstName, $PatientLastName, $PatientBirthDate, $PatientBloodType, $PatientObservations );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -117,22 +116,25 @@
         }
 
         private function updateRecord() {
-            if (!isset($this->requestBody['data']['PatientId']) || !isset($this->requestBody['data']['Patientname']) || 
-            !isset($this->requestBody['data']['Email']) || !isset($this->requestBody['data']['PhoneNumber']) || 
-            !isset($this->requestBody['data']['FirstName']) || !isset($this->requestBody['data']['LastName']) || 
-            !isset($this->requestBody['data']['AreaId']))
+            if (!isset($this->requestBody['data']['PatientId']) 
+            || !isset($this->requestBody['data']['PatientAffiliationId']) 
+            || !isset($this->requestBody['data']['PatientFirstName']) 
+            || !isset($this->requestBody['data']['PatientLastName']) 
+            || !isset($this->requestBody['data']['PatientBirthDate']) 
+            || !isset($this->requestBody['data']['PatientBloodType']) 
+            || !isset($this->requestBody['data']['PatientObservations']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
             $PatientId = $this->requestBody['data']['PatientId'];
-            $Patientname = $this->requestBody['data']['Patientname'];
-            $Email = isset($this->requestBody['data']['Email']) ? $this->requestBody['data']['Email'] : NULL;
-            $PhoneNumber = isset($this->requestBody['data']['PhoneNumber']) ? $this->requestBody['data']['PhoneNumber'] : NULL;
-            $FirstName = $this->requestBody['data']['FirstName'];
-            $LastName = $this->requestBody['data']['LastName'];
-            $AreaId = $this->requestBody['data']['AreaId'];
+            $PatientAffiliationId = isset($this->requestBody['data']['PatientAffiliationId']) ? $this->requestBody['data']['PatientAffiliationId'] : NULL;
+            $PatientFirstName = isset($this->requestBody['data']['PatientFirstName']) ? $this->requestBody['data']['PatientFirstName'] : NULL;
+            $PatientLastName = isset($this->requestBody['data']['PatientLastName']) ? $this->requestBody['data']['PatientLastName'] : NULL;
+            $PatientBirthDate = $this->requestBody['data']['PatientBirthDate'];
+            $PatientBloodType = isset($this->requestBody['data']['PatientBloodType']) ? $this->requestBody['data']['PatientBloodType'] : NULL;
+            $PatientObservations = isset($this->requestBody['data']['PatientObservations']) ? $this->requestBody['data']['PatientObservations'] : NULL;
 
-            $result = $this->resourceObject->updatePatient( $PatientId, $Patientname, $Email, $PhoneNumber, $FirstName, $LastName, $AreaId );
+            $result = $this->resourceObject->updatePatient( $PatientId, $PatientAffiliationId, $PatientFirstName, $PatientLastName, $PatientBirthDate, $PatientBloodType, $PatientObservations );
             if ( $result['count'] < 1 ) {
                 return $this->unprocessableEntityResponse($result);
             } else {

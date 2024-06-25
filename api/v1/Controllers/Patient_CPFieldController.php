@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/ProblemSubCategory.php' );
+    require_once( './Models/Patient_CPField.php' );
     
-    // USER CONTROLLER
-    class ProblemSubCategoryController extends APIController {
+    // PATIENT_CPFIELD CONTROLLER
+    class Patient_CPFieldController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new ProblemSubCategory();
+            $this->resourceObject = new Patient_CPField();
         }
 
         public function processRequest() {
@@ -33,7 +33,7 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getProblemsSubCategoriesStatuses();
+                            $response = $this->getPatients_CPFieldsStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
@@ -60,7 +60,7 @@
             return $response;
         }
 
-        private function getProblemsSubCategoriesStatuses() {
+        private function getPatients_CPFieldsStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -69,7 +69,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getProblemSubCategory($this->resourceId);
+            $result = $this->resourceObject->getPatient_CPField($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -85,15 +85,17 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['ProblemCategoryId'])
-            || !isset($this->requestBody['data']['ProblemSubCategoryName']))
+            if (!isset($this->requestBody['data']['PatientId']) 
+            || !isset($this->requestBody['data']['CPFieldId'])
+            || !isset($this->requestBody['data']['Patient_CPFieldNote']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
-            $ProblemSubCategoryName = $this->requestBody['data']['ProblemSubCategoryName'];
+            $PatientId = $this->requestBody['data']['PatientId'];
+            $CPFieldId = $this->requestBody['data']['CPFieldId'];
+            $Patient_CPFieldNote = isset($this->requestBody['data']['Patient_CPFieldNote']) ? $this->requestBody['data']['Patient_CPFieldNote'] : NULL;
             
-            $result = $this->resourceObject->createProblemSubCategory($ProblemCategoryId, $ProblemSubCategoryName);
+            $result = $this->resourceObject->createPatient_CPField( $PatientId, $CPFieldId, $Patient_CPFieldNote );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -101,17 +103,19 @@
         }
 
         private function updateRecord() {
-            if (!isset($this->requestBody['data']['ProblemSubCategoryId']) 
-            || !isset($this->requestBody['data']['ProblemCategoryId']) 
-            || !isset($this->requestBody['data']['ProblemSubCategoryName']))
+            if (!isset($this->requestBody['data']['Patient_CPFieldId']) 
+            || !isset($this->requestBody['data']['PatientId']) 
+            || !isset($this->requestBody['data']['CPFieldId'])
+            || !isset($this->requestBody['data']['Patient_CPFieldNote']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemSubCategoryId = $this->requestBody['data']['ProblemSubCategoryId'];
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
-            $ProblemSubCategoryName = $this->requestBody['data']['ProblemSubCategoryName'];
+            $Patient_CPFieldId = $this->requestBody['data']['Patient_CPFieldId'];
+            $PatientId = $this->requestBody['data']['PatientId'];
+            $CPFieldId = $this->requestBody['data']['CPFieldId'];
+            $Patient_CPFieldNote = isset($this->requestBody['data']['Patient_CPFieldNote']) ? $this->requestBody['data']['Patient_CPFieldNote'] : NULL;
 
-            $result = $this->resourceObject->updateProblemSubCategory($ProblemSubCategoryId, $ProblemCategoryId, $ProblemSubCategoryName);
+            $result = $this->resourceObject->updatePatient_CPField( $Patient_CPFieldId, $PatientId, $CPFieldId, $Patient_CPFieldNote );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -119,17 +123,17 @@
         }
 
         private function modifyRecord() {
-            if (!isset($this->requestBody['data']['ProblemSubCategoryId']) 
+            if (!isset($this->requestBody['data']['Patient_CPFieldId']) 
             || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemSubCategoryId = $this->requestBody['data']['ProblemSubCategoryId'];
+            $Patient_CPFieldId = $this->requestBody['data']['Patient_CPFieldId'];
 
             if ( $this->requestBody['data']['Action'] == 'Deactivate' )
-                $result = $this->resourceObject->deactivateProblemSubCategory($ProblemSubCategoryId);
+                $result = $this->resourceObject->deactivatePatient_CPField($Patient_CPFieldId);
             else if ( $this->requestBody['data']['Action'] == 'Reactivate' )
-                $result = $this->resourceObject->reactivateProblemSubCategory($ProblemSubCategoryId);
+                $result = $this->resourceObject->reactivatePatient_CPField($Patient_CPFieldId);
             else
                 return $this->notAcceptableResponse('Incorrect action');
             

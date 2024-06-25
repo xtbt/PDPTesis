@@ -3,7 +3,7 @@
     require_once( './Controllers/APIController.php' );
     require_once( './Models/Institution.php' );
     
-    // USER CONTROLLER
+    // INSTITUTION CONTROLLER
     class InstitutionController extends APIController {
 
         private $requestMethod = NULL;

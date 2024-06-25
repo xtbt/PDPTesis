@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/User_ModuleOption.php' );
+    require_once( './Models/CPField.php' );
     
-    // USER CONTROLLER
-    class User_ModuleOptionController extends APIController {
+    // CPFIELD CONTROLLER
+    class CPFieldController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new User_ModuleOption();
+            $this->resourceObject = new CPField();
         }
 
         public function processRequest() {
@@ -33,7 +33,7 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getModulesOptionsStatuses();
+                            $response = $this->getCPFieldsStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
@@ -60,7 +60,7 @@
             return $response;
         }
 
-        private function getModulesOptionsStatuses() {
+        private function getCPFieldsStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -69,7 +69,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getUser_ModuleOption($this->resourceId);
+            $result = $this->resourceObject->getCPField($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -85,15 +85,17 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['UserId']) 
-            || !isset($this->requestBody['data']['ModuleOptionId']))
+            if (!isset($this->requestBody['data']['CPFieldCategoryId'])
+            || !isset($this->requestBody['data']['CPFieldName'])
+            || !isset($this->requestBody['data']['CPFieldText']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $UserId = $this->requestBody['data']['UserId'];
-            $ModuleOptionId = $this->requestBody['data']['ModuleOptionId'];
+            $CPFieldCategoryId = $this->requestBody['data']['CPFieldCategoryId'];
+            $CPFieldName = $this->requestBody['data']['CPFieldName'];
+            $CPFieldText = $this->requestBody['data']['CPFieldText'];
             
-            $result = $this->resourceObject->createUser_ModuleOption( $UserId, $ModuleOptionId );
+            $result = $this->resourceObject->createCPField( $CPFieldCategoryId, $CPFieldName, $CPFieldText );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -101,17 +103,19 @@
         }
 
         private function updateRecord() {
-            if (!isset($this->requestBody['data']['User_ModuleOptionId']) 
-            || !isset($this->requestBody['data']['UserId']) 
-            || !isset($this->requestBody['data']['ModuleOptionId']))
+            if (!isset($this->requestBody['data']['CPFieldId']) 
+            || !isset($this->requestBody['data']['CPFieldCategoryId']) 
+            || !isset($this->requestBody['data']['CPFieldName'])
+            || !isset($this->requestBody['data']['CPFieldText']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $User_ModuleOptionId = $this->requestBody['data']['User_ModuleOptionId'];
-            $UserId = $this->requestBody['data']['UserId'];
-            $ModuleOptionId = $this->requestBody['data']['ModuleOptionId'];
+            $CPFieldId = $this->requestBody['data']['CPFieldId'];
+            $CPFieldCategoryId = $this->requestBody['data']['CPFieldCategoryId'];
+            $CPFieldName = $this->requestBody['data']['CPFieldName'];
+            $CPFieldText = $this->requestBody['data']['CPFieldText'];
 
-            $result = $this->resourceObject->updateUser_ModuleOption( $User_ModuleOptionId, $UserId, $ModuleOptionId );
+            $result = $this->resourceObject->updateCPField($CPFieldId, $CPFieldCategoryId, $CPFieldName, $CPFieldText);
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -119,16 +123,17 @@
         }
 
         private function modifyRecord() {
-            if (!isset($this->requestBody['data']['User_ModuleOptionId']) || !isset($this->requestBody['data']['Action']))
+            if (!isset($this->requestBody['data']['CPFieldId']) 
+            || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $User_ModuleOptionId = $this->requestBody['data']['User_ModuleOptionId'];
+            $CPFieldId = $this->requestBody['data']['CPFieldId'];
 
             if ( $this->requestBody['data']['Action'] == 'Deactivate' )
-                $result = $this->resourceObject->deactivateUser_ModuleOption($User_ModuleOptionId);
+                $result = $this->resourceObject->deactivateCPField($CPFieldId);
             else if ( $this->requestBody['data']['Action'] == 'Reactivate' )
-                $result = $this->resourceObject->reactivateUser_ModuleOption($User_ModuleOptionId);
+                $result = $this->resourceObject->reactivateCPField($CPFieldId);
             else
                 return $this->notAcceptableResponse('Incorrect action');
             
