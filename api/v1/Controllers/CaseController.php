@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/Ticket.php' );
+    require_once( './Models/CaseM.php' );
     
-    // USER CONTROLLER
-    class TicketController extends APIController {
+    // CASE CONTROLLER
+    class CaseController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new Ticket();
+            $this->resourceObject = new CaseM();
         }
 
         public function processRequest() {
@@ -33,7 +33,7 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getTicketsStatuses();
+                            $response = $this->getCasesStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
@@ -55,8 +55,8 @@
                     if ( NULL !== $this->resourceId ) {
                         if ( 'changeStatus' === $this->resourceId )
                             $response = $this->changeStatus();
-                        else if ( 'closeTicket' === $this->resourceId )
-                            $response = $this->closeTicket();
+                        else if ( 'closeCase' === $this->resourceId )
+                            $response = $this->closeCase();
                         else
                             $response = $this->notAcceptableResponse('Incorrect use of resource');
                     } else
@@ -74,7 +74,7 @@
             return $response;
         }
 
-        private function getTicketsStatuses() {
+        private function getCasesStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -83,7 +83,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getTicket($this->resourceId);
+            $result = $this->resourceObject->getCase($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -99,17 +99,23 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['ProblemCategoryId'])
-            || !isset($this->requestBody['data']['ProblemSubCategoryId'])
-            || !isset($this->requestBody['data']['TicketDescription']))
+            if (!isset($this->requestBody['data']['PatientId'])
+            || !isset($this->requestBody['data']['CaseDate'])
+            || !isset($this->requestBody['data']['LastMenstrualPeriod'])
+            || !isset($this->requestBody['data']['InitialBloodPressure'])
+            || !isset($this->requestBody['data']['InitialWeight'])
+            || !isset($this->requestBody['data']['InitialSymtoms']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
-            $ProblemSubCategoryId = $this->requestBody['data']['ProblemSubCategoryId'];
-            $TicketDescription = $this->requestBody['data']['TicketDescription'];
+            $PatientId = $this->requestBody['data']['PatientId'];
+            $CaseDate = $this->requestBody['data']['CaseDate'];
+            $LastMenstrualPeriod = $this->requestBody['data']['LastMenstrualPeriod'];
+            $InitialBloodPressure = $this->requestBody['data']['InitialBloodPressure'];
+            $InitialWeight = $this->requestBody['data']['InitialWeight'];
+            $InitialSymtoms = $this->requestBody['data']['InitialSymtoms'];
             
-            $result = $this->resourceObject->createTicket( $ProblemCategoryId, $ProblemSubCategoryId, $TicketDescription );
+            $result = $this->resourceObject->createCase( $PatientId, $CaseDate, $LastMenstrualPeriod, $InitialBloodPressure, $InitialWeight, $InitialSymtoms );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -117,19 +123,27 @@
         }
 
         private function updateRecord() {
-            if (!isset($this->requestBody['data']['TicketId'])
-            || !isset($this->requestBody['data']['ProblemCategoryId'])
-            || !isset($this->requestBody['data']['ProblemSubCategoryId'])
-            || !isset($this->requestBody['data']['TicketDescription']))
+            if (!isset($this->requestBody['data']['CaseId'])
+            || !isset($this->requestBody['data']['PatientId'])
+            || !isset($this->requestBody['data']['CaseDate'])
+            || !isset($this->requestBody['data']['LastMenstrualPeriod'])
+            || !isset($this->requestBody['data']['InitialBloodPressure'])
+            || !isset($this->requestBody['data']['InitialWeight'])
+            || !isset($this->requestBody['data']['InitialSymtoms'])
+            || !isset($this->requestBody['data']['CaseNotes']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
-            $ProblemSubCategoryId = $this->requestBody['data']['ProblemSubCategoryId'];
-            $TicketDescription = $this->requestBody['data']['TicketDescription'];
+            $CaseId = $this->requestBody['data']['CaseId'];
+            $PatientId = $this->requestBody['data']['PatientId'];
+            $CaseDate = $this->requestBody['data']['CaseDate'];
+            $LastMenstrualPeriod = $this->requestBody['data']['LastMenstrualPeriod'];
+            $InitialBloodPressure = $this->requestBody['data']['InitialBloodPressure'];
+            $InitialWeight = $this->requestBody['data']['InitialWeight'];
+            $InitialSymtoms = $this->requestBody['data']['InitialSymtoms'];
+            $CaseNotes = $this->requestBody['data']['CaseNotes'];
 
-            $result = $this->resourceObject->updateTicket( $TicketId, $ProblemCategoryId, $ProblemSubCategoryId, $TicketDescription );
+            $result = $this->resourceObject->updateCase( $CaseId, $PatientId, $CaseDate, $LastMenstrualPeriod, $InitialBloodPressure, $InitialWeight, $InitialSymtoms, $CaseNotes );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -137,17 +151,17 @@
         }
 
         private function modifyRecord() {
-            if (!isset($this->requestBody['data']['TicketId']) 
+            if (!isset($this->requestBody['data']['CaseId']) 
             || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
+            $CaseId = $this->requestBody['data']['CaseId'];
 
             if ( $this->requestBody['data']['Action'] == 'Cancel' )
-                $result = $this->resourceObject->cancelTicket($TicketId);
+                $result = $this->resourceObject->cancelCase($CaseId);
             else if ( $this->requestBody['data']['Action'] == 'Reopen' )
-                $result = $this->resourceObject->reopenTicket($TicketId);
+                $result = $this->resourceObject->reopenCase($CaseId);
             else
                 return $this->notAcceptableResponse('Incorrect action');
             
@@ -158,31 +172,31 @@
         }
 
         private function changeStatus() {
-            if (!isset($this->requestBody['data']['TicketId']) 
-            || !isset($this->requestBody['data']['TicketStatusId']))
+            if (!isset($this->requestBody['data']['CaseId']) 
+            || !isset($this->requestBody['data']['CaseStatusId']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
-            $TicketStatusId = $this->requestBody['data']['TicketStatusId'];
+            $CaseId = $this->requestBody['data']['CaseId'];
+            $CaseStatusId = $this->requestBody['data']['CaseStatusId'];
 
-            $result = $this->resourceObject->changeTicketStatus( $TicketId, $TicketStatusId );
+            $result = $this->resourceObject->changeCaseStatus( $CaseId, $CaseStatusId );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
                 return $this->okResponse($result);
         }
 
-        private function closeTicket() {
-            if (!isset($this->requestBody['data']['TicketId']) 
-            || !isset($this->requestBody['data']['TicketLastComment']))
+        private function closeCase() {
+            if (!isset($this->requestBody['data']['CaseId']) 
+            || !isset($this->requestBody['data']['CaseNotes']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
-            $TicketLastComment = $this->requestBody['data']['TicketLastComment'];
+            $CaseId = $this->requestBody['data']['CaseId'];
+            $CaseNotes = $this->requestBody['data']['CaseNotes'];
 
-            $result = $this->resourceObject->closeTicket( $TicketId, $TicketLastComment );
+            $result = $this->resourceObject->closeCase( $CaseId, $CaseNotes );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -194,10 +208,10 @@
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->queryString['TicketId'];
+            $CaseId = $this->queryString['CaseId'];
             $Context = $this->queryString['Context'];
             
-            $result = $this->resourceObject->uploadFile( $TicketId, $Context );
+            $result = $this->resourceObject->uploadFile( $CaseId, $Context );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else

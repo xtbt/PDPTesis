@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/TicketUpdate.php' );
+    require_once( './Models/CaseLabtestParam.php' );
     
-    // USER CONTROLLER
-    class TicketUpdateController extends APIController {
+    // CASELABTESTPARAM CONTROLLER
+    class CaseLabtestParamController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new TicketUpdate();
+            $this->resourceObject = new CaseLabtestParam();
         }
 
         public function processRequest() {
@@ -33,19 +33,25 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getTicketUpdatesStatuses();
+                            $response = $this->getCasesLabtestsParamsStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
                         $response = $this->getAllRecords();
                     break;
                 case 'POST':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->createRecord();
                     break;
                 case 'PUT':
                         $response = $this->updateRecord();
                     break;
                 case 'PATCH':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->modifyRecord();
                     break;
                 case 'DELETE':
@@ -60,7 +66,7 @@
             return $response;
         }
 
-        private function getTicketUpdatesStatuses() {
+        private function getCasesLabtestsParamsStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -69,7 +75,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getTicketUpdate($this->resourceId);
+            $result = $this->resourceObject->getCaseLabtestParam($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -85,15 +91,17 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['TicketId']) 
-            || !isset($this->requestBody['data']['TicketUpdateNote']))
+            if (!isset($this->requestBody['data']['CaseLabtestId'])
+            || !isset($this->requestBody['data']['CaseLabtestParam'])
+            || !isset($this->requestBody['data']['CaseLabtestParamResult']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
-            $TicketUpdateNote = $this->requestBody['data']['TicketUpdateNote'];
+            $CaseLabtestId = $this->requestBody['data']['CaseLabtestId'];
+            $CaseLabtestParam = $this->requestBody['data']['CaseLabtestParam'];
+            $CaseLabtestParamResult = $this->requestBody['data']['CaseLabtestParamResult'];
             
-            $result = $this->resourceObject->createTicketUpdate( $TicketId, $TicketUpdateNote );
+            $result = $this->resourceObject->createCaseLabtestParam( $CaseLabtestId, $CaseLabtestParam, $CaseLabtestParamResult );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -101,40 +109,44 @@
         }
 
         private function updateRecord() {
-            // if (!isset($this->requestBody['data']['TicketUpdateId']) 
-            // || !isset($this->requestBody['data']['TicketUpdateNote']))
+            if (!isset($this->requestBody['data']['CaseLabtestParamId'])
+            || !isset($this->requestBody['data']['CaseLabtestId'])
+            || !isset($this->requestBody['data']['CaseLabtestParam'])
+            || !isset($this->requestBody['data']['CaseLabtestParamResult']))
                 return $this->notAcceptableResponse('Missing parameters');
             
-            // // Required fields ------------------------------------------------
-            // $TicketUpdateId = $this->requestBody['data']['TicketUpdateId'];
-            // $TicketUpdateNote = $this->requestBody['data']['TicketUpdateNote'];
+            // Required fields ------------------------------------------------
+            $CaseLabtestParamId = $this->requestBody['data']['CaseLabtestParamId'];
+            $CaseLabtestId = $this->requestBody['data']['CaseLabtestId'];
+            $CaseLabtestParam = $this->requestBody['data']['CaseLabtestParam'];
+            $CaseLabtestParamResult = $this->requestBody['data']['CaseLabtestParamResult'];
 
-            // $result = $this->resourceObject->updateTicketUpdate( $TicketUpdateId, $TicketUpdateNote );
-            // if ( $result['count'] < 1 )
-            //     return $this->unprocessableEntityResponse($result);
-            // else
-            //    return $this->okResponse($result);
+            $result = $this->resourceObject->updateCaseLabtestParam( $CaseLabtestParamId, $CaseLabtestId, $CaseLabtestParam, $CaseLabtestParamResult );
+            if ( $result['count'] < 1 )
+                return $this->unprocessableEntityResponse($result);
+            else
+               return $this->okResponse($result);
         }
 
         private function modifyRecord() {
-            // if (!isset($this->requestBody['data']['TicketUpdateId']) 
-            // || !isset($this->requestBody['data']['Action']))
+            if (!isset($this->requestBody['data']['CaseLabtestParamId']) 
+            || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
-            // // Required fields ------------------------------------------------
-            // $TicketUpdateId = $this->requestBody['data']['TicketUpdateId'];
+            // Required fields ------------------------------------------------
+            $CaseLabtestParamId = $this->requestBody['data']['CaseLabtestParamId'];
 
-            // if ( $this->requestBody['data']['Action'] == 'Deactivate' )
-            //     $result = $this->resourceObject->deactivateTicketUpdate($TicketUpdateId);
-            // else if ( $this->requestBody['data']['Action'] == 'Reactivate' )
-            //     $result = $this->resourceObject->reactivateTicketUpdate($TicketUpdateId);
-            // else
-            //     return $this->notAcceptableResponse('Incorrect action');
+            if ( $this->requestBody['data']['Action'] == 'Cancel' )
+                $result = $this->resourceObject->cancelCaseLabtestParam($CaseLabtestParamId);
+            else if ( $this->requestBody['data']['Action'] == 'Reopen' )
+                $result = $this->resourceObject->reopenCaseLabtestParam($CaseLabtestParamId);
+            else
+                return $this->notAcceptableResponse('Incorrect action');
             
-            // if ( $result['count'] < 1 )
-            //     return $this->unprocessableEntityResponse($result);
-            // else
-            //     return $this->okResponse($result);
+            if ( $result['count'] < 1 )
+                return $this->unprocessableEntityResponse($result);
+            else
+                return $this->okResponse($result);
         }
     }
 ?>

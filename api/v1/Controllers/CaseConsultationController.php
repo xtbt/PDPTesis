@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/ProblemCategory.php' );
+    require_once( './Models/CaseConsultation.php' );
     
-    // USER CONTROLLER
-    class ProblemCategoryController extends APIController {
+    // CASECONSULTATION CONTROLLER
+    class CaseConsultationController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new ProblemCategory();
+            $this->resourceObject = new CaseConsultation();
         }
 
         public function processRequest() {
@@ -33,19 +33,25 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getProblemsCategoriesStatuses();
+                            $response = $this->getCasesConsultationsStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
                         $response = $this->getAllRecords();
                     break;
                 case 'POST':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->createRecord();
                     break;
                 case 'PUT':
                         $response = $this->updateRecord();
                     break;
                 case 'PATCH':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->modifyRecord();
                     break;
                 case 'DELETE':
@@ -60,7 +66,7 @@
             return $response;
         }
 
-        private function getProblemsCategoriesStatuses() {
+        private function getCasesConsultationsStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -69,7 +75,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getProblemCategory($this->resourceId);
+            $result = $this->resourceObject->getCaseConsultation($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -85,13 +91,23 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['ProblemCategoryName']))
+            if (!isset($this->requestBody['data']['CaseId'])
+            || !isset($this->requestBody['data']['CaseConsultationDate'])
+            || !isset($this->requestBody['data']['CurrentBloodPressure'])
+            || !isset($this->requestBody['data']['CurrentWeight'])
+            || !isset($this->requestBody['data']['CurrentSymtoms'])
+            || !isset($this->requestBody['data']['CaseConsultationNotes']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemCategoryName = $this->requestBody['data']['ProblemCategoryName'];
+            $CaseId = $this->requestBody['data']['CaseId'];
+            $CaseConsultationDate = $this->requestBody['data']['CaseConsultationDate'];
+            $CurrentBloodPressure = $this->requestBody['data']['CurrentBloodPressure'];
+            $CurrentWeight = $this->requestBody['data']['CurrentWeight'];
+            $CurrentSymtoms = $this->requestBody['data']['CurrentSymtoms'];
+            $CaseConsultationNotes = $this->requestBody['data']['CaseConsultationNotes'];
             
-            $result = $this->resourceObject->createProblemCategory($ProblemCategoryName);
+            $result = $this->resourceObject->createCaseConsultation( $CaseId, $CaseConsultationDate, $CurrentBloodPressure, $CurrentWeight, $CurrentSymtoms, $CaseConsultationNotes );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -99,15 +115,25 @@
         }
 
         private function updateRecord() {
-            if (!isset($this->requestBody['data']['ProblemCategoryId']) 
-            || !isset($this->requestBody['data']['ProblemCategoryName']))
+            if (!isset($this->requestBody['data']['CaseConsultationId'])
+            || !isset($this->requestBody['data']['CaseId'])
+            || !isset($this->requestBody['data']['CaseConsultationDate'])
+            || !isset($this->requestBody['data']['CurrentBloodPressure'])
+            || !isset($this->requestBody['data']['CurrentWeight'])
+            || !isset($this->requestBody['data']['CurrentSymtoms'])
+            || !isset($this->requestBody['data']['CaseConsultationNotes']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
-            $ProblemCategoryName = $this->requestBody['data']['ProblemCategoryName'];
+            $CaseConsultationId = $this->requestBody['data']['CaseConsultationId'];
+            $CaseId = $this->requestBody['data']['CaseId'];
+            $CaseConsultationDate = $this->requestBody['data']['CaseConsultationDate'];
+            $CurrentBloodPressure = $this->requestBody['data']['CurrentBloodPressure'];
+            $CurrentWeight = $this->requestBody['data']['CurrentWeight'];
+            $CurrentSymtoms = $this->requestBody['data']['CurrentSymtoms'];
+            $CaseConsultationNotes = $this->requestBody['data']['CaseConsultationNotes'];
 
-            $result = $this->resourceObject->updateProblemCategory($ProblemCategoryId, $ProblemCategoryName);
+            $result = $this->resourceObject->updateCaseConsultation( $CaseConsultationId, $CaseId, $CaseConsultationDate, $CurrentBloodPressure, $CurrentWeight, $CurrentSymtoms, $CaseConsultationNotes );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -115,16 +141,17 @@
         }
 
         private function modifyRecord() {
-            if (!isset($this->requestBody['data']['ProblemCategoryId']) || !isset($this->requestBody['data']['Action']))
+            if (!isset($this->requestBody['data']['CaseConsultationId']) 
+            || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $ProblemCategoryId = $this->requestBody['data']['ProblemCategoryId'];
+            $CaseConsultationId = $this->requestBody['data']['CaseConsultationId'];
 
-            if ( $this->requestBody['data']['Action'] == 'Deactivate' )
-                $result = $this->resourceObject->deactivateProblemCategory($ProblemCategoryId);
-            else if ( $this->requestBody['data']['Action'] == 'Reactivate' )
-                $result = $this->resourceObject->reactivateProblemCategory($ProblemCategoryId);
+            if ( $this->requestBody['data']['Action'] == 'Cancel' )
+                $result = $this->resourceObject->cancelCaseConsultation($CaseConsultationId);
+            else if ( $this->requestBody['data']['Action'] == 'Reopen' )
+                $result = $this->resourceObject->reopenCaseConsultation($CaseConsultationId);
             else
                 return $this->notAcceptableResponse('Incorrect action');
             

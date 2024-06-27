@@ -1,10 +1,10 @@
 <?php
     // REQUIRED MODULES
     require_once( './Controllers/APIController.php' );
-    require_once( './Models/TicketUpdate.php' );
+    require_once( './Models/CaseConsultationDx.php' );
     
-    // USER CONTROLLER
-    class TicketUpdateController extends APIController {
+    // CASECONSULTATION CONTROLLER
+    class CaseConsultationDxController extends APIController {
 
         private $requestMethod = NULL;
         private $resourceId = NULL;
@@ -20,7 +20,7 @@
             $this->queryString = $queryString;
             $this->requestBody = $requestBody;
 
-            $this->resourceObject = new TicketUpdate();
+            $this->resourceObject = new CaseConsultationDx();
         }
 
         public function processRequest() {
@@ -33,19 +33,25 @@
                 case 'GET':
                     if ( NULL !== $this->resourceId ) {
                         if ( 'statuses' === $this->resourceId )
-                            $response = $this->getTicketUpdatesStatuses();
+                            $response = $this->getCasesConsultationsDxsStatuses();
                         else
                             $response = $this->getSingleRecord();
                     } else
                         $response = $this->getAllRecords();
                     break;
                 case 'POST':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->createRecord();
                     break;
                 case 'PUT':
                         $response = $this->updateRecord();
                     break;
                 case 'PATCH':
+                    if ( NULL !== $this->resourceId ) {
+                        $response = $this->notAcceptableResponse('Incorrect use of resource');
+                    } else
                         $response = $this->modifyRecord();
                     break;
                 case 'DELETE':
@@ -60,7 +66,7 @@
             return $response;
         }
 
-        private function getTicketUpdatesStatuses() {
+        private function getCasesConsultationsDxsStatuses() {
             $result = $this->resourceObject->getStatuses($this->queryString);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
@@ -69,7 +75,7 @@
         }
 
         private function getSingleRecord() {
-            $result = $this->resourceObject->getTicketUpdate($this->resourceId);
+            $result = $this->resourceObject->getCaseConsultationDx($this->resourceId);
             if ( $result['count'] < 1 )
                 return $this->notFoundResponse($result);
             else
@@ -85,15 +91,17 @@
         }
 
         private function createRecord() {
-            if (!isset($this->requestBody['data']['TicketId']) 
-            || !isset($this->requestBody['data']['TicketUpdateNote']))
+            if (!isset($this->requestBody['data']['CaseConsultationId'])
+            || !isset($this->requestBody['data']['CaseConsultationDxCIE11'])
+            || !isset($this->requestBody['data']['CaseConsultationDxDescription']))
                 return $this->notAcceptableResponse('Missing parameters');
             
             // Required fields ------------------------------------------------
-            $TicketId = $this->requestBody['data']['TicketId'];
-            $TicketUpdateNote = $this->requestBody['data']['TicketUpdateNote'];
+            $CaseConsultationId = $this->requestBody['data']['CaseConsultationId'];
+            $CaseConsultationDxCIE11 = $this->requestBody['data']['CaseConsultationDxCIE11'];
+            $CaseConsultationDxDescription = $this->requestBody['data']['CaseConsultationDxDescription'];
             
-            $result = $this->resourceObject->createTicketUpdate( $TicketId, $TicketUpdateNote );
+            $result = $this->resourceObject->createCaseConsultationDx( $CaseConsultationId, $CaseConsultationDxCIE11, $CaseConsultationDxDescription );
             if ( $result['count'] < 1 )
                 return $this->unprocessableEntityResponse($result);
             else
@@ -101,40 +109,44 @@
         }
 
         private function updateRecord() {
-            // if (!isset($this->requestBody['data']['TicketUpdateId']) 
-            // || !isset($this->requestBody['data']['TicketUpdateNote']))
+            if (!isset($this->requestBody['data']['CaseConsultationDxId'])
+            || !isset($this->requestBody['data']['CaseConsultationId'])
+            || !isset($this->requestBody['data']['CaseConsultationDxCIE11'])
+            || !isset($this->requestBody['data']['CaseConsultationDxDescription']))
                 return $this->notAcceptableResponse('Missing parameters');
             
-            // // Required fields ------------------------------------------------
-            // $TicketUpdateId = $this->requestBody['data']['TicketUpdateId'];
-            // $TicketUpdateNote = $this->requestBody['data']['TicketUpdateNote'];
+            // Required fields ------------------------------------------------
+            $CaseConsultationDxId = $this->requestBody['data']['CaseConsultationDxId'];
+            $CaseConsultationId = $this->requestBody['data']['CaseConsultationId'];
+            $CaseConsultationDxCIE11 = $this->requestBody['data']['CaseConsultationDxCIE11'];
+            $CaseConsultationDxDescription = $this->requestBody['data']['CaseConsultationDxDescription'];
 
-            // $result = $this->resourceObject->updateTicketUpdate( $TicketUpdateId, $TicketUpdateNote );
-            // if ( $result['count'] < 1 )
-            //     return $this->unprocessableEntityResponse($result);
-            // else
-            //    return $this->okResponse($result);
+            $result = $this->resourceObject->updateCaseConsultationDx( $CaseConsultationDxId, $CaseConsultationId, $CaseConsultationDxCIE11, $CaseConsultationDxDescription );
+            if ( $result['count'] < 1 )
+                return $this->unprocessableEntityResponse($result);
+            else
+               return $this->okResponse($result);
         }
 
         private function modifyRecord() {
-            // if (!isset($this->requestBody['data']['TicketUpdateId']) 
-            // || !isset($this->requestBody['data']['Action']))
+            if (!isset($this->requestBody['data']['CaseConsultationDxId']) 
+            || !isset($this->requestBody['data']['Action']))
                 return $this->notAcceptableResponse('Missing parameters');
             
-            // // Required fields ------------------------------------------------
-            // $TicketUpdateId = $this->requestBody['data']['TicketUpdateId'];
+            // Required fields ------------------------------------------------
+            $CaseConsultationDxId = $this->requestBody['data']['CaseConsultationDxId'];
 
-            // if ( $this->requestBody['data']['Action'] == 'Deactivate' )
-            //     $result = $this->resourceObject->deactivateTicketUpdate($TicketUpdateId);
-            // else if ( $this->requestBody['data']['Action'] == 'Reactivate' )
-            //     $result = $this->resourceObject->reactivateTicketUpdate($TicketUpdateId);
-            // else
-            //     return $this->notAcceptableResponse('Incorrect action');
+            if ( $this->requestBody['data']['Action'] == 'Cancel' )
+                $result = $this->resourceObject->cancelCaseConsultationDx($CaseConsultationDxId);
+            else if ( $this->requestBody['data']['Action'] == 'Reopen' )
+                $result = $this->resourceObject->reopenCaseConsultationDx($CaseConsultationDxId);
+            else
+                return $this->notAcceptableResponse('Incorrect action');
             
-            // if ( $result['count'] < 1 )
-            //     return $this->unprocessableEntityResponse($result);
-            // else
-            //     return $this->okResponse($result);
+            if ( $result['count'] < 1 )
+                return $this->unprocessableEntityResponse($result);
+            else
+                return $this->okResponse($result);
         }
     }
 ?>
