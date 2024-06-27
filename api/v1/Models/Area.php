@@ -6,6 +6,7 @@
         
         // Class properties
         public $AreaId;
+        public $InstitutionId;
         public $AreaName;
         public $AreaStatusId;
 
@@ -35,7 +36,7 @@
 
         // Function that gets all rows in the Database
         // If criteria was defined, it filters the result
-        public function getAll($queryString = NULL) {
+        public function getAll( $queryString = NULL ) {
             $this->DB_initProperties();
             if (!$this->buildSQLCriteria( $queryString, $this->SearchCriteriaFieldsString ))
                  return $this->response; // Return SQL criteria error
@@ -43,6 +44,7 @@
             try {
                 $SQL_GlobalQuery = 'SELECT 
                     AreaId, 
+                    InstitutionId, 
                     AreaName, 
                     AreaStatusId 
                     FROM '
@@ -87,7 +89,7 @@
         // ********************************************************************
         // (READ) GET A SINGLE ROW ********************************************
         // ********************************************************************
-        public function getArea($AreaId) {
+        public function getArea( $AreaId ) {
             $this->DB_initProperties();
             if (is_numeric($AreaId)) {
                 $this->SQL_Conditions .= ' AND AreaId = :AreaId';
@@ -101,6 +103,7 @@
             try {
                 $SQL_Query = 'SELECT 
                     AreaId, 
+                    InstitutionId, 
                     AreaName, 
                     AreaStatusId 
                     FROM '
@@ -138,18 +141,20 @@
         // ********************************************************************
         // (CREATE) CREATE NEW RECORD INTO DB *********************************
         // ********************************************************************
-        public function createArea($AreaName) {
+        public function createArea( $InstitutionId, $AreaName ) {
             $this->DB_initProperties();
             $AreaId = NULL; // NULL by default on new records
             $AreaStatusId = 1; // 1(Active) by default on new records
             try {
                 $SQL_Query = 'INSERT INTO tblAreas VALUES (
                   :AreaId, 
+                  :InstitutionId, 
                   :AreaName, 
                   :AreaStatusId)';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
                 $this->SQL_Sentence->bindParam(':AreaId', $AreaId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->bindParam(':AreaName', $AreaName, PDO::PARAM_STR);
                 $this->SQL_Sentence->bindParam(':AreaStatusId', $AreaStatusId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
@@ -174,12 +179,12 @@
         // ********************************************************************
         // (UPDATE) UPDATE RECORD ON DB ***************************************
         // ********************************************************************
-        public function updateArea($AreaId, $AreaName) {
+        public function updateArea( $AreaId, $InstitutionId, $AreaName ) {
             $this->getArea($AreaId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
 
             // Confirm changes on at least 1 field ----------------------------
-            if ($this->AreaName == $AreaName) {
+            if ($this->InstitutionId == $InstitutionId && $this->AreaName == $AreaName) {
                 $this->response['msg'] = '['.get_class($this).'] Warning: No modifications made on record';
                 return $this->response; // Return 'no modification' response
             };
@@ -187,11 +192,13 @@
 
             try {
                 $SQL_Query = 'UPDATE tblAreas SET 
-                  AreaName = :AreaName 
-                  WHERE 
-                  AreaId = :AreaId';
+                    InstitutionId = :InstitutionId, 
+                    AreaName = :AreaName 
+                    WHERE 
+                    AreaId = :AreaId';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->bindParam(':AreaName', $AreaName, PDO::PARAM_STR);
                 $this->SQL_Sentence->bindParam(':AreaId', $AreaId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
@@ -214,7 +221,7 @@
         // ********************************************************************
         // (REACTIVATE) REACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function reactivateArea($AreaId) {
+        public function reactivateArea( $AreaId ) {
             $this->getArea($AreaId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
             $AreaStatusId = 1; // Default active status (1)

@@ -2,51 +2,59 @@
     require_once( './System/Database.php' );
     require_once( './Models/AppModelCore.php' );
 
-    class User_ModuleOption extends AppModelCore {
-        
+    class Patient extends AppModelCore {
+
         // Class properties
-        public $User_ModuleOptionId;
-        public $UserId;
-        public $ModuleOptionId;
-        public $User_ModuleOptionStatusId;
+        public $PatientId;
+        public $PatientAffiliationId;
+        public $PatientFirstName;
+        public $PatientLastName;
+        public $PatientBirthDate;
+        public $PatientBloodType;
+        public $PatientObservations;
+        public $PatientStatusId;
 
         // Search criteria fields string
-        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(User_ModuleOptionId,""),"]",COALESCE(UserId,""),"|",COALESCE(ModuleOptionId,""),"|",COALESCE(ModuleOptionName,""))';
-        
+        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(PatientId,""),"]",COALESCE(PatientAffiliationId,""),"|",COALESCE(PatientFirstName,""),"|",COALESCE(PatientLastName,""),"|",COALESCE(PatientBloodType,""))';
+
         // Constructor (DB Connection)
         public function __construct() {
             global $appBearerToken, $appUserId;
             $this->appBearerToken = $appBearerToken;
             $this->appUserId = $appUserId;
-            
+
             $this->DB_Connector = Database::getInstance()->getConnector(); // Get singleton DB connector
         }
 
         // Init DB properties -------------------------------------------------
         private function DB_initProperties() {
-            $this->SQL_Tables = 'tblUsers_ModulesOptions';
+            $this->SQL_Tables = 'tblPatients AS t1';
             $this->SQL_Conditions = 'TRUE';
-            $this->SQL_Order = 'User_ModuleOptionId';
+            $this->SQL_Order = 'PatientId';
             $this->SQL_Limit = NULL;
             $this->SQL_Params = [];
             $this->SQL_Sentence = NULL;
-            
+
             $this->initResponseData();
         }
 
         // Function that gets all rows in the Database
         // If criteria was defined, it filters the result
-        public function getAll($queryString = NULL) {
+        public function getAll( $queryString = NULL ) {
             $this->DB_initProperties();
             if (!$this->buildSQLCriteria( $queryString, $this->SearchCriteriaFieldsString ))
                  return $this->response; // Return SQL criteria error
             
             try {
                 $SQL_GlobalQuery = 'SELECT 
-                    User_ModuleOptionId, 
-                    UserId, 
-                    ModuleOptionId, 
-                    User_ModuleOptionStatusId 
+                    t1.PatientId AS PatientId, 
+                    t1.PatientAffiliationId AS PatientAffiliationId, 
+                    t1.PatientFirstName AS PatientFirstName, 
+                    t1.PatientLastName AS PatientLastName, 
+                    t1.PatientBirthDate AS PatientBirthDate, 
+                    t1.PatientBloodType AS PatientBloodType, 
+                    t1.PatientObservations AS PatientObservations, 
+                    t1.PatientStatusId AS PatientStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -80,7 +88,7 @@
         // CRUD FUNCTIONS START ***********************************************
         
         // Update class properties --------------------------------------------
-        private function updateProperties($field_array) {
+        private function updateProperties( $field_array ) {
             foreach ($field_array AS $propertyName => $value) {
                 $this->$propertyName = $value;
             };
@@ -89,10 +97,10 @@
         // ********************************************************************
         // (READ) GET A SINGLE ROW ********************************************
         // ********************************************************************
-        public function getUser_ModuleOption( $User_ModuleOptionId ) {
+        public function getPatient( $PatientId ) {
             $this->DB_initProperties();
-            if (is_numeric($User_ModuleOptionId)) {
-                $this->SQL_Conditions .= ' AND User_ModuleOptionId = :User_ModuleOptionId';
+            if (is_numeric($PatientId)) {
+                $this->SQL_Conditions .= ' AND PatientId = :PatientId';
                 $this->SQL_Limit = '0,1';
             }
             else {
@@ -102,10 +110,14 @@
             
             try {
                 $SQL_Query = 'SELECT 
-                    User_ModuleOptionId, 
-                    UserId, 
-                    ModuleOptionId, 
-                    User_ModuleOptionStatusId 
+                    t1.PatientId AS PatientId, 
+                    t1.PatientAffiliationId AS PatientAffiliationId, 
+                    t1.PatientFirstName AS PatientFirstName, 
+                    t1.PatientLastName AS PatientLastName, 
+                    t1.PatientBirthDate AS PatientBirthDate, 
+                    t1.PatientBloodType AS PatientBloodType, 
+                    t1.PatientObservations AS PatientObservations, 
+                    t1.PatientStatusId AS PatientStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -113,7 +125,7 @@
                     (!is_null($this->SQL_Limit) ? ' LIMIT '.$this->SQL_Limit.';' : ';');
                 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionId', $User_ModuleOptionId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientId', $PatientId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 if ($this->SQL_Sentence->rowCount() < 1) {
                     $this->response['count'] = 0; // No records found
@@ -123,8 +135,8 @@
                 };
 
                 // If there is data, we build the response with DB info -------
-                $this->response['data'][$User_ModuleOptionId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
-                $this->updateProperties($this->response['data'][$User_ModuleOptionId]);
+                $this->response['data'][$PatientId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
+                $this->updateProperties($this->response['data'][$PatientId]);
                 $this->response['count'] = 1; // Unique record
                 $this->response['globalCount'] = 1; // Unique record
                 // ------------------------------------------------------------
@@ -141,28 +153,37 @@
         // ********************************************************************
         // (CREATE) CREATE NEW RECORD INTO DB *********************************
         // ********************************************************************
-        public function createUser_ModuleOption( $UserId, $ModuleOptionId ) {
+        public function createPatient( $PatientAffiliationId, $PatientFirstName, $PatientLastName, $PatientBirthDate, $PatientBloodType, $PatientObservations ) {
             $this->DB_initProperties();
-            $User_ModuleOptionId = NULL; // NULL by default on new records
-            $User_ModuleOptionStatusId = 1; // 1(Active) by default on new records
+            $PatientId = NULL; // NULL by default on new records
+            $PatientStatusId = 1; // 1(Active) by default on new records
+
             try {
-                $SQL_Query = 'INSERT INTO tblUsers_ModulesOptions VALUES (
-                    :User_ModuleOptionId, 
-                    :UserId, 
-                    :ModuleOptionId, 
-                    :User_ModuleOptionStatusId)';
+                $SQL_Query = 'INSERT INTO tblPatients VALUES (
+                    :PatientId, 
+                    :PatientAffiliationId, 
+                    :PatientFirstName, 
+                    :PatientLastName, 
+                    :PatientBirthDate, 
+                    :PatientBloodType, 
+                    :PatientObservations, 
+                    :PatientStatusId)';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionId', $User_ModuleOptionId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':UserId', $UserId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ModuleOptionId', $ModuleOptionId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionStatusId', $User_ModuleOptionStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientId', $PatientId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientAffiliationId', $PatientAffiliationId, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientFirstName', $PatientFirstName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientLastName', $PatientLastName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientBirthDate', $PatientBirthDate, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientBloodType', $PatientBloodType, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientObservations', $PatientObservations, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientStatusId', $PatientStatusId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $User_ModuleOptionId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
+                    $PatientId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
                     $this->response['count'] = 1;
-                    $this->response['data'] = ['id' => $User_ModuleOptionId];
+                    $this->response['data'] = ['id' => $PatientId];
                     $this->response['msg'] = '['.get_class($this).'] Ok: New record created successfully';
                 }
                 else {
@@ -179,33 +200,45 @@
         // ********************************************************************
         // (UPDATE) UPDATE RECORD ON DB ***************************************
         // ********************************************************************
-        public function updateUser_ModuleOption( $User_ModuleOptionId, $UserId, $ModuleOptionId ) {
-            $this->getUser_ModuleOption($User_ModuleOptionId); // Get current record data from DB
+        public function updatePatient( $PatientId, $PatientAffiliationId, $PatientFirstName, $PatientLastName, $PatientBirthDate, $PatientBloodType, $PatientObservations ) {
+            $this->getPatient( $PatientId ); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
 
             // Confirm changes on at least 1 field ----------------------------
-            if ($this->UserId == $UserId 
-            && $this->ModuleOptionId == $ModuleOptionId) {
+            if ($this->PatientAffiliationId == $PatientAffiliationId 
+            && $this->PatientFirstName == $PatientFirstName 
+            && $this->PatientLastName == $PatientLastName 
+            && $this->PatientBirthDate == $PatientBirthDate 
+            && $this->PatientBloodType == $PatientBloodType 
+            && $this->PatientObservations == $PatientObservations) {
                 $this->response['msg'] = '['.get_class($this).'] Warning: No modifications made on record';
                 return $this->response; // Return 'no modification' response
             };
             // ----------------------------------------------------------------
 
             try {
-                $SQL_Query = 'UPDATE tblUsers_ModulesOptions SET 
-                    UserId = :UserId, 
-                    ModuleOptionId = :ModuleOptionId 
-                    WHERE 
-                    User_ModuleOptionId = :User_ModuleOptionId';
+                $SQL_Query = 'UPDATE tblPatients SET 
+                  PatientAffiliationId = :PatientAffiliationId, 
+                  PatientFirstName = :PatientFirstName, 
+                  PatientLastName = :PatientLastName, 
+                  PatientBirthDate = :PatientBirthDate, 
+                  PatientBloodType = :PatientBloodType, 
+                  PatientObservations = :PatientObservations 
+                  WHERE 
+                  PatientId = :PatientId';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':UserId', $UserId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ModuleOptionId', $ModuleOptionId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionId', $User_ModuleOptionId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientAffiliationId', $PatientAffiliationId, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientFirstName', $PatientFirstName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientLastName', $PatientLastName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientBirthDate', $PatientBirthDate, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientBloodType', $PatientBloodType, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientObservations', $PatientObservations, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':PatientId', $PatientId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getUser_ModuleOption($User_ModuleOptionId); // Update current object data with modified info
+                    $this->getPatient($PatientId); // Update current object data with modified info
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record updated successfully';
                 }
                 else {
@@ -222,24 +255,24 @@
         // ********************************************************************
         // (REACTIVATE) REACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function reactivateUser_ModuleOption( $User_ModuleOptionId ) {
-            $this->getUser_ModuleOption($User_ModuleOptionId); // Get current record data from DB
+        public function reactivatePatient( $PatientId ) {
+            $this->getPatient($PatientId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $User_ModuleOptionStatusId = 1; // Default active status (1)
+            $PatientStatusId = 1; // Default active status (1)
 
             try {
-                $SQL_Query = 'UPDATE tblUsers_ModulesOptions SET 
-                    User_ModuleOptionStatusId = :User_ModuleOptionStatusId 
+                $SQL_Query = 'UPDATE tblPatients SET 
+                    PatientStatusId = :PatientStatusId 
                     WHERE 
-                    User_ModuleOptionId = :User_ModuleOptionId';
+                    PatientId = :PatientId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionStatusId', $User_ModuleOptionStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionId', $User_ModuleOptionId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientStatusId', $PatientStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientId', $PatientId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getUser_ModuleOption($User_ModuleOptionId); // Update current object data after reactivation
+                    $this->getPatient($PatientId); // Update current object data after reactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record reactivated successfully';
                 }
                 else {
@@ -256,24 +289,24 @@
         // ********************************************************************
         // (DEACTIVATE) DEACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function deactivateUser_ModuleOption( $User_ModuleOptionId ) {
-            $this->getUser_ModuleOption($User_ModuleOptionId); // Get current record data from DB
+        public function deactivatePatient( $PatientId ) {
+            $this->getPatient($PatientId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $User_ModuleOptionStatusId = 0; // Default inactive status (0)
+            $PatientStatusId = 0; // Default inactive status (0)
 
             try {
-                $SQL_Query = 'UPDATE tblUsers_ModulesOptions SET 
-                    User_ModuleOptionStatusId = :User_ModuleOptionStatusId 
+                $SQL_Query = 'UPDATE tblPatients SET 
+                    PatientStatusId = :PatientStatusId 
                     WHERE 
-                    User_ModuleOptionId = :User_ModuleOptionId';
+                    PatientId = :PatientId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionStatusId', $User_ModuleOptionStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':User_ModuleOptionId', $User_ModuleOptionId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientStatusId', $PatientStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':PatientId', $PatientId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getUser_ModuleOption($User_ModuleOptionId); // Update current object data after deactivation
+                    $this->getUser($UserId); // Update current object data after deactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record deactivated successfully';
                 }
                 else {
@@ -287,10 +320,9 @@
             return $this->response; // Return response Array
         }
 
-// ****************************************************************************
-// ******* AUXILIARY METHODS (NON-CRUD) ***************************************
-// ****************************************************************************
-        
+        // ****************************************************************************
+        // ******* AUXILIARY METHODS **************************************************
+        // ****************************************************************************
         public function getStatuses ($queryString = NULL) {
             $this->DB_initProperties();
             $SQLCriteria = !empty($queryString) ? $this->buildSQLCriteria( $queryString, $this->SearchCriteriaFieldsString ) : NULL;
@@ -299,12 +331,12 @@
                 // MANUAL STATIC RESPONSE *************************************
                 $this->response['data'] = [
                     array(
-                        'User_ModuleOptionStatusId' => 0,
-                        'User_ModuleOptionStatusValue' => 'Inactive'
+                        'PatientStatusId' => 0,
+                        'PatientStatusValue' => 'Inactive'
                     ),
                     array(
-                        'User_ModuleOptionStatusId' => 1,
-                        'User_ModuleOptionStatusValue' => 'Active'
+                        'PatientStatusId' => 1,
+                        'PatientStatusValue' => 'Active'
                     )
                 ]; // Data Array to be included in the response
                 

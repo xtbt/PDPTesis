@@ -2,33 +2,30 @@
     require_once( './System/Database.php' );
     require_once( './Models/AppModelCore.php' );
 
-    class ProblemSubCategory extends AppModelCore {
+    class Institution extends AppModelCore {
         
         // Class properties
-        public $ProblemSubCategoryId;
-        public $ProblemCategoryId;
-        public $ProblemCategoryName;           // tblProblemsCategories::ProblemCategoryName
-        public $ProblemSubCategoryName;
-        public $ProblemSubCategoryStatusId;
+        public $InstitutionId;
+        public $InstitutionName;
+        public $InstitutionStatusId;
 
         // Search criteria fields string
-        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(ProblemSubCategoryId,""),"]",COALESCE(ProblemCategoryName,""),COALESCE(ProblemSubCategoryName,""))';
-
+        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(InstitutionId,""),"]",COALESCE(InstitutionName,""),"|",COALESCE(InstitutionShortname,""))';
+        
         // Constructor (DB Connection)
         public function __construct() {
             global $appBearerToken, $appUserId;
             $this->appBearerToken = $appBearerToken;
             $this->appUserId = $appUserId;
-
+            
             $this->DB_Connector = Database::getInstance()->getConnector(); // Get singleton DB connector
         }
 
         // Init DB properties -------------------------------------------------
         private function DB_initProperties() {
-            $this->SQL_Tables = 'tblProblemsSubCategories AS t1 LEFT JOIN 
-                                tblProblemsCategories AS t2 USING(ProblemCategoryId)';
+            $this->SQL_Tables = 'tblInstitutions';
             $this->SQL_Conditions = 'TRUE';
-            $this->SQL_Order = 'ProblemSubCategoryId';
+            $this->SQL_Order = 'InstitutionId';
             $this->SQL_Limit = NULL;
             $this->SQL_Params = [];
             $this->SQL_Sentence = NULL;
@@ -38,18 +35,17 @@
 
         // Function that gets all rows in the Database
         // If criteria was defined, it filters the result
-        public function getAll($queryString = NULL) {
+        public function getAll( $queryString = NULL ) {
             $this->DB_initProperties();
             if (!$this->buildSQLCriteria( $queryString, $this->SearchCriteriaFieldsString ))
                  return $this->response; // Return SQL criteria error
             
             try {
                 $SQL_GlobalQuery = 'SELECT 
-                    t1.ProblemSubCategoryId AS ProblemSubCategoryId, 
-                    t1.ProblemCategoryId AS ProblemCategoryId, 
-                    t2.ProblemCategoryName AS ProblemCategoryName, 
-                    t1.ProblemSubCategoryName AS ProblemSubCategoryName, 
-                    t1.ProblemSubCategoryStatusId AS ProblemSubCategoryStatusId 
+                    InstitutionId, 
+                    InstitutionName, 
+                    InstitutionShortname, 
+                    InstitutionStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -92,10 +88,10 @@
         // ********************************************************************
         // (READ) GET A SINGLE ROW ********************************************
         // ********************************************************************
-        public function getProblemSubCategory($ProblemSubCategoryId) {
+        public function getInstitution( $InstitutionId ) {
             $this->DB_initProperties();
-            if (is_numeric($ProblemSubCategoryId)) {
-                $this->SQL_Conditions .= ' AND ProblemSubCategoryId = :ProblemSubCategoryId';
+            if (is_numeric($InstitutionId)) {
+                $this->SQL_Conditions .= ' AND InstitutionId = :InstitutionId';
                 $this->SQL_Limit = '0,1';
             }
             else {
@@ -105,11 +101,10 @@
             
             try {
                 $SQL_Query = 'SELECT 
-                    t1.ProblemSubCategoryId AS ProblemSubCategoryId, 
-                    t1.ProblemCategoryId AS ProblemCategoryId, 
-                    t2.ProblemCategoryName AS ProblemCategoryName, 
-                    t1.ProblemSubCategoryName AS ProblemSubCategoryName, 
-                    t1.ProblemSubCategoryStatusId AS ProblemSubCategoryStatusId 
+                    InstitutionId, 
+                    InstitutionName, 
+                    InstitutionShortname, 
+                    InstitutionStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -117,7 +112,7 @@
                     (!is_null($this->SQL_Limit) ? ' LIMIT '.$this->SQL_Limit.';' : ';');
                 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryId', $ProblemSubCategoryId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 if ($this->SQL_Sentence->rowCount() < 1) {
                     $this->response['count'] = 0; // No records found
@@ -127,8 +122,8 @@
                 };
 
                 // If there is data, we build the response with DB info -------
-                $this->response['data'][$ProblemSubCategoryId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
-                $this->updateProperties($this->response['data'][$ProblemSubCategoryId]);
+                $this->response['data'][$InstitutionId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
+                $this->updateProperties($this->response['data'][$InstitutionId]);
                 $this->response['count'] = 1; // Unique record
                 $this->response['globalCount'] = 1; // Unique record
                 // ------------------------------------------------------------
@@ -145,28 +140,28 @@
         // ********************************************************************
         // (CREATE) CREATE NEW RECORD INTO DB *********************************
         // ********************************************************************
-        public function createProblemSubCategory($ProblemCategoryId, $ProblemSubCategoryName) {
+        public function createInstitution( $InstitutionName, $InstitutionShortname ) {
             $this->DB_initProperties();
-            $ProblemSubCategoryId = NULL; // NULL by default on new records
-            $ProblemSubCategoryStatusId = 1; // 1(Active) by default on new records
+            $InstitutionId = NULL; // NULL by default on new records
+            $InstitutionStatusId = 1; // 1(Active) by default on new records
             try {
-                $SQL_Query = 'INSERT INTO tblProblemsSubCategories VALUES (
-                    :ProblemSubCategoryId, 
-                    :ProblemCategoryId, 
-                    :ProblemSubCategoryName, 
-                    :ProblemSubCategoryStatusId)';
+                $SQL_Query = 'INSERT INTO tblInstitutions VALUES (
+                  :InstitutionId, 
+                  :InstitutionName, 
+                  :InstitutionShortname, 
+                  :InstitutionStatusId)';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryId', $ProblemSubCategoryId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ProblemCategoryId', $ProblemCategoryId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryName', $ProblemSubCategoryName, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryStatusId', $ProblemSubCategoryStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionName', $InstitutionName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':InstitutionShortname', $InstitutionShortname, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':InstitutionStatusId', $InstitutionStatusId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $ProblemSubCategoryId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
+                    $InstitutionId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
                     $this->response['count'] = 1;
-                    $this->response['data'] = ['id' => $ProblemSubCategoryId];
+                    $this->response['data'] = ['id' => $InstitutionId];
                     $this->response['msg'] = '['.get_class($this).'] Ok: New record created successfully';
                 }
                 else {
@@ -183,32 +178,32 @@
         // ********************************************************************
         // (UPDATE) UPDATE RECORD ON DB ***************************************
         // ********************************************************************
-        public function updateProblemSubCategory($ProblemSubCategoryId, $ProblemCategoryId, $ProblemSubCategoryName) {
-            $this->getProblemSubCategory($ProblemSubCategoryId); // Get current record data from DB
+        public function updateInstitution( $InstitutionId, $InstitutionName, $InstitutionShortname ) {
+            $this->getInstitution($InstitutionId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
 
             // Confirm changes on at least 1 field ----------------------------
-            if ($this->ProblemCategoryId == $ProblemCategoryId && $this->ProblemSubCategoryName == $ProblemSubCategoryName) {
+            if ($this->InstitutionName == $InstitutionName && $this->InstitutionShortname == $InstitutionShortname) {
                 $this->response['msg'] = '['.get_class($this).'] Warning: No modifications made on record';
                 return $this->response; // Return 'no modification' response
             };
             // ----------------------------------------------------------------
 
             try {
-                $SQL_Query = 'UPDATE tblProblemsSubCategories SET 
-                    ProblemCategoryId = :ProblemCategoryId, 
-                    ProblemSubCategoryName = :ProblemSubCategoryName 
+                $SQL_Query = 'UPDATE tblInstitutions SET 
+                    InstitutionName = :InstitutionName, 
+                    InstitutionShortname = :InstitutionShortname 
                     WHERE 
-                    ProblemSubCategoryId = :ProblemSubCategoryId';
+                    InstitutionId = :InstitutionId';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':ProblemCategoryId', $ProblemCategoryId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryName', $ProblemSubCategoryName, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryId', $ProblemSubCategoryId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionName', $InstitutionName, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':InstitutionShortname', $InstitutionShortname, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getProblemSubCategory($ProblemSubCategoryId); // Update current object data with modified info
+                    $this->getInstitution($InstitutionId); // Update current object data with modified info
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record updated successfully';
                 }
                 else {
@@ -225,24 +220,24 @@
         // ********************************************************************
         // (REACTIVATE) REACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function reactivateProblemSubCategory($ProblemSubCategoryId) {
-            $this->getProblemSubCategory($ProblemSubCategoryId); // Get current record data from DB
+        public function reactivateInstitution( $InstitutionId ) {
+            $this->getInstitution($InstitutionId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $ProblemSubCategoryStatusId = 1; // Default active status (1)
+            $InstitutionStatusId = 1; // Default active status (1)
 
             try {
-                $SQL_Query = 'UPDATE tblProblemsSubCategories SET 
-                    ProblemSubCategoryStatusId = :ProblemSubCategoryStatusId 
+                $SQL_Query = 'UPDATE tblInstitutions SET 
+                    InstitutionStatusId = :InstitutionStatusId 
                     WHERE 
-                    ProblemSubCategoryId = :ProblemSubCategoryId';
+                    InstitutionId = :InstitutionId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryStatusId', $ProblemSubCategoryStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryId', $ProblemSubCategoryId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionStatusId', $InstitutionStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getProblemSubCategory($ProblemSubCategoryId); // Update current object data after reactivation
+                    $this->getInstitution($InstitutionId); // Update current object data after reactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record reactivated successfully';
                 }
                 else {
@@ -259,24 +254,24 @@
         // ********************************************************************
         // (DEACTIVATE) DEACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function deactivateProblemSubCategory($ProblemSubCategoryId) {
-            $this->getProblemSubCategory($ProblemSubCategoryId); // Get current record data from DB
+        public function deactivateInstitution($InstitutionId) {
+            $this->getInstitution($InstitutionId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $ProblemSubCategoryStatusId = 0; // Default inactive status (0)
+            $InstitutionStatusId = 0; // Default inactive status (0)
 
             try {
-                $SQL_Query = 'UPDATE tblProblemsSubCategories SET 
-                    ProblemSubCategoryStatusId = :ProblemSubCategoryStatusId 
+                $SQL_Query = 'UPDATE tblInstitutions SET 
+                    InstitutionStatusId = :InstitutionStatusId 
                     WHERE 
-                    ProblemSubCategoryId = :ProblemSubCategoryId';
+                    InstitutionId = :InstitutionId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryStatusId', $ProblemSubCategoryStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':ProblemSubCategoryId', $ProblemSubCategoryId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionStatusId', $InstitutionStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':InstitutionId', $InstitutionId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getProblemSubCategory($ProblemSubCategoryId); // Update current object data after deactivation
+                    $this->getInstitution($InstitutionId); // Update current object data after deactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record deactivated successfully';
                 }
                 else {
@@ -302,12 +297,12 @@
                 // MANUAL STATIC RESPONSE *************************************
                 $this->response['data'] = [
                     array(
-                        'ProblemSubCategoryStatusId' => 0,
-                        'ProblemSubCategoryStatusValue' => 'Inactive'
+                        'InstitutionStatusId' => 0,
+                        'InstitutionStatusValue' => 'Inactive'
                     ),
                     array(
-                        'ProblemSubCategoryStatusId' => 1,
-                        'ProblemSubCategoryStatusValue' => 'Active'
+                        'InstitutionStatusId' => 1,
+                        'InstitutionStatusValue' => 'Active'
                     )
                 ]; // Data Array to be included in the response
                 
