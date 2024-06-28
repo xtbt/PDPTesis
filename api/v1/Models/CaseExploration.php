@@ -187,7 +187,7 @@
         // ********************************************************************
         // (UPDATE) UPDATE RECORD ON DB ***************************************
         // ********************************************************************
-        public function updateCaseExploration( $CaseExplorationId, $CaseId, $CaseExplorationDate, $CurrentBloodPressure, $CurrentWeight, $CurrentSymptoms, $CaseExplorationNotes ) {
+        public function updateCaseExploration( $CaseExplorationId, $CaseId, $CaseExplorationDate, $CaseExplorationNotes ) {
             $this->getCaseExploration($CaseExplorationId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
 
@@ -203,9 +203,6 @@
                 $SQL_Query = 'UPDATE tblCasesExplorations SET 
                     CaseId = :CaseId, 
                     CaseExplorationDate = :CaseExplorationDate, 
-                    CurrentBloodPressure = :CurrentBloodPressure, 
-                    CurrentWeight = :CurrentWeight, 
-                    CurrentSymptoms = :CurrentSymptoms, 
                     CaseExplorationNotes = :CaseExplorationNotes 
                     WHERE 
                     CaseExplorationId = :CaseExplorationId';
@@ -213,11 +210,7 @@
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
                 $this->SQL_Sentence->bindParam(':CaseId', $CaseId, PDO::PARAM_INT);
                 $this->SQL_Sentence->bindParam(':CaseExplorationDate', $CaseExplorationDate, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentBloodPressure', $CurrentBloodPressure, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentWeight', $CurrentWeight, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CurrentSymptoms', $CurrentSymptoms, PDO::PARAM_STR);
                 $this->SQL_Sentence->bindParam(':CaseExplorationNotes', $CaseExplorationNotes, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CaseExplorationStatusId', $CaseExplorationStatusId, PDO::PARAM_INT);
                 $this->SQL_Sentence->bindParam(':CaseExplorationId', $CaseExplorationId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 

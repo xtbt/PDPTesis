@@ -82,26 +82,56 @@
                 $controllerObject = new PatientController( $requestMethod, $resourceId, $queryString, $requestBody );
                 $apiResponse = $controllerObject->processRequest();
                 break;
-            // case 'problems-categories':
-            //     require_once( './Controllers/ProblemCategoryController.php' );
-            //     $controllerObject = new ProblemCategoryController( $requestMethod, $resourceId, $queryString, $requestBody );
-            //     $apiResponse = $controllerObject->processRequest();
-            //     break;
-            // case 'problems-subcategories':
-            //     require_once( './Controllers/ProblemSubCategoryController.php' );
-            //     $controllerObject = new ProblemSubCategoryController( $requestMethod, $resourceId, $queryString, $requestBody );
-            //     $apiResponse = $controllerObject->processRequest();
-            //     break;
-            // case 'tickets':
-            //     require_once( './Controllers/TicketController.php' );
-            //     $controllerObject = new TicketController( $requestMethod, $resourceId, $queryString, $requestBody );
-            //     $apiResponse = $controllerObject->processRequest();
-            //     break;
-            // case 'tickets-updates':
-            //     require_once( './Controllers/TicketUpdateController.php' );
-            //     $controllerObject = new TicketUpdateController( $requestMethod, $resourceId, $queryString, $requestBody );
-            //     $apiResponse = $controllerObject->processRequest();
-            //     break;
+            case 'cpcategories':
+                require_once( './Controllers/CPCategoryController.php' );
+                $controllerObject = new CPCategoryController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cpfields':
+                require_once( './Controllers/CPFieldController.php' );
+                $controllerObject = new CPFieldController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'patients_cpfields':
+                require_once( './Controllers/Patient_CPFieldController.php' );
+                $controllerObject = new Patient_CPFieldController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases':
+                require_once( './Controllers/CaseController.php' );
+                $controllerObject = new CaseController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-consultations':
+                require_once( './Controllers/CaseConsultationController.php' );
+                $controllerObject = new CaseConsultationController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-consultations-dx':
+                require_once( './Controllers/CaseConsultationDxController.php' );
+                $controllerObject = new CaseConsultationDxController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-explorations':
+                require_once( './Controllers/CaseExplorationController.php' );
+                $controllerObject = new CaseExplorationController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-explorations-params':
+                require_once( './Controllers/CaseExplorationParamController.php' );
+                $controllerObject = new CaseExplorationParamController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-labtests':
+                require_once( './Controllers/CaseLabtestController.php' );
+                $controllerObject = new CaseLabtestController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
+            case 'cases-labtests-params':
+                require_once( './Controllers/CaseLabtestParamController.php' );
+                $controllerObject = new CaseLabtestParamController( $requestMethod, $resourceId, $queryString, $requestBody );
+                $apiResponse = $controllerObject->processRequest();
+                break;
             default:
                 $apiResponse = [
                     'statusCodeHeader' => 'HTTP/1.1 404 Not Found', 

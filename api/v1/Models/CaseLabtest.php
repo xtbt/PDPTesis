@@ -2,20 +2,17 @@
     require_once( './System/Database.php' );
     require_once( './Models/AppModelCore.php' );
 
-    class CaseConsultation extends AppModelCore {
+    class CaseLabtest extends AppModelCore {
         
         // Class properties
-        public $CaseConsultationId;
+        public $CaseLabtestId;
         public $CaseId;
-        public $CaseConsultationDate;
-        public $CurrentBloodPressure;
-        public $CurrentWeight;
-        public $CurrentSymtoms;
-        public $CaseConsultationNotes;
-        public $CaseConsultationStatusId;
+        public $CaseLabtestDate;
+        public $CaseLabtestNotes;
+        public $CaseLabtestStatusId;
 
         // Search criteria fields string
-        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(CaseConsultationId,""),"]",COALESCE(CaseId,""))';
+        private $SearchCriteriaFieldsString = 'CONCAT("[",COALESCE(CaseLabtestId,""),"]",COALESCE(CaseId,""))';
 
         // Constructor (DB Connection)
         public function __construct() {
@@ -28,10 +25,10 @@
 
         // Init DB properties -------------------------------------------------
         private function DB_initProperties() {
-            $this->SQL_Tables = 'tblCasesConsultations AS t1 LEFT JOIN 
+            $this->SQL_Tables = 'tblCasesLabtests AS t1 LEFT JOIN 
                                 tblCases AS t2 USING(CaseId)';
             $this->SQL_Conditions = 'TRUE';
-            $this->SQL_Order = 'CaseConsultationId';
+            $this->SQL_Order = 'CaseLabtestId';
             $this->SQL_Limit = NULL;
             $this->SQL_Params = [];
             $this->SQL_Sentence = NULL;
@@ -48,14 +45,11 @@
             
             try {
                 $SQL_GlobalQuery = 'SELECT 
-                    t1.CaseConsultationId AS CaseConsultationId, 
+                    t1.CaseLabtestId AS CaseLabtestId, 
                     t1.CaseId AS CaseId, 
-                    t1.CaseConsultationDate AS CaseConsultationDate, 
-                    t1.CurrentBloodPressure AS CurrentBloodPressure, 
-                    t1.CurrentWeight AS CurrentWeight, 
-                    t1.CurrentSymptoms AS CurrentSymptoms, 
-                    t1.CaseConsultationNotes AS CaseConsultationNotes, 
-                    t1.CaseConsultationStatusId AS CaseConsultationStatusId 
+                    t1.CaseLabtestDate AS CaseLabtestDate, 
+                    t1.CaseLabtestNotes AS CaseLabtestNotes, 
+                    t1.CaseLabtestStatusId AS CaseLabtestStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -98,10 +92,10 @@
         // ********************************************************************
         // (READ) GET A SINGLE ROW ********************************************
         // ********************************************************************
-        public function getCaseConsultation( $CaseConsultationId ) {
+        public function getCaseLabtest( $CaseLabtestId ) {
             $this->DB_initProperties();
-            if (is_numeric($CaseConsultationId)) {
-                $this->SQL_Conditions .= ' AND CaseConsultationId = :CaseConsultationId';
+            if (is_numeric($CaseLabtestId)) {
+                $this->SQL_Conditions .= ' AND CaseLabtestId = :CaseLabtestId';
                 $this->SQL_Limit = '0,1';
             }
             else {
@@ -111,14 +105,11 @@
             
             try {
                 $SQL_Query = 'SELECT 
-                    t1.CaseConsultationId AS CaseConsultationId, 
+                    t1.CaseLabtestId AS CaseLabtestId, 
                     t1.CaseId AS CaseId, 
-                    t1.CaseConsultationDate AS CaseConsultationDate, 
-                    t1.CurrentBloodPressure AS CurrentBloodPressure, 
-                    t1.CurrentWeight AS CurrentWeight, 
-                    t1.CurrentSymptoms AS CurrentSymptoms, 
-                    t1.CaseConsultationNotes AS CaseConsultationNotes, 
-                    t1.CaseConsultationStatusId AS CaseConsultationStatusId 
+                    t1.CaseLabtestDate AS CaseLabtestDate, 
+                    t1.CaseLabtestNotes AS CaseLabtestNotes, 
+                    t1.CaseLabtestStatusId AS CaseLabtestStatusId 
                     FROM '
                     .$this->SQL_Tables.
                     ' WHERE '
@@ -126,7 +117,7 @@
                     (!is_null($this->SQL_Limit) ? ' LIMIT '.$this->SQL_Limit.';' : ';');
                 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':CaseConsultationId', $CaseConsultationId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestId', $CaseLabtestId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 if ($this->SQL_Sentence->rowCount() < 1) {
                     $this->response['count'] = 0; // No records found
@@ -136,8 +127,8 @@
                 };
 
                 // If there is data, we build the response with DB info -------
-                $this->response['data'][$CaseConsultationId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
-                $this->updateProperties($this->response['data'][$CaseConsultationId]);
+                $this->response['data'][$CaseLabtestId] = $this->SQL_Sentence->fetch(PDO::FETCH_ASSOC);
+                $this->updateProperties($this->response['data'][$CaseLabtestId]);
                 $this->response['count'] = 1; // Unique record
                 $this->response['globalCount'] = 1; // Unique record
                 // ------------------------------------------------------------
@@ -154,38 +145,32 @@
         // ********************************************************************
         // (CREATE) CREATE NEW RECORD INTO DB *********************************
         // ********************************************************************
-        public function createCaseConsultation( $CaseId, $CaseConsultationDate, $CurrentBloodPressure, $CurrentWeight, $CurrentSymptoms, $CaseConsultationNotes ) {
+        public function createCaseLabtest( $CaseId, $CaseLabtestDate, $CaseLabtestNotes ) {
             $this->DB_initProperties();
-            $CaseConsultationId = NULL; // NULL by default on new records
-            $CaseConsultationDate = new DateTime(date('Y-m-d H:i:s')); // Current DateTime object
-            $CaseConsultationDate = $CaseConsultationDate->format('Y-m-d'); // String converted
-            $CaseConsultationStatusId = 1; // 1(Pending) by default on new records
+            $CaseLabtestId = NULL; // NULL by default on new records
+            $CaseLabtestDate = new DateTime(date('Y-m-d H:i:s')); // Current DateTime object
+            $CaseLabtestDate = $CaseLabtestDate->format('Y-m-d'); // String converted
+            $CaseLabtestStatusId = 1; // 1(Pending) by default on new records
             try {
-                $SQL_Query = 'INSERT INTO tblCasesConsultations VALUES (
-                    :CaseConsultationId, 
+                $SQL_Query = 'INSERT INTO tblCasesLabtests VALUES (
+                    :CaseLabtestId, 
                     :CaseId, 
-                    :CaseConsultationDate, 
-                    :CurrentBloodPressure, 
-                    :CurrentWeight, 
-                    :CurrentSymptoms, 
-                    :CaseConsultationNotes, 
-                    :CaseConsultationStatusId)';
+                    :CaseLabtestDate, 
+                    :CaseLabtestNotes, 
+                    :CaseLabtestStatusId)';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':CaseConsultationId', $CaseConsultationId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestId', $CaseLabtestId, PDO::PARAM_INT);
                 $this->SQL_Sentence->bindParam(':CaseId', $CaseId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CaseConsultationDate', $CaseConsultationDate, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentBloodPressure', $CurrentBloodPressure, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentWeight', $CurrentWeight, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CurrentSymptoms', $CurrentSymptoms, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CaseConsultationNotes', $CaseConsultationNotes, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CaseConsultationStatusId', $CaseConsultationStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestDate', $CaseLabtestDate, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':CaseLabtestNotes', $CaseLabtestNotes, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':CaseLabtestStatusId', $CaseLabtestStatusId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $CaseConsultationId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
+                    $CaseLabtestId = $this->DB_Connector->lastInsertId(); // Get newly created record ID
                     $this->response['count'] = 1;
-                    $this->response['data'] = ['id' => $CaseConsultationId];
+                    $this->response['data'] = ['id' => $CaseLabtestId];
                     $this->response['msg'] = '['.get_class($this).'] Ok: New record created successfully';
                 }
                 else {
@@ -202,42 +187,35 @@
         // ********************************************************************
         // (UPDATE) UPDATE RECORD ON DB ***************************************
         // ********************************************************************
-        public function updateCaseConsultation( $CaseConsultationId, $CaseId, $CaseConsultationDate, $CurrentBloodPressure, $CurrentWeight, $CurrentSymptoms, $CaseConsultationNotes ) {
-            $this->getCaseConsultation($CaseConsultationId); // Get current record data from DB
+        public function updateCaseLabtest( $CaseLabtestId, $CaseId, $CaseLabtestDate, $CaseLabtestNotes ) {
+            $this->getCaseLabtest($CaseLabtestId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
 
             // Confirm changes on at least 1 field ----------------------------
-            if ( $this->CaseId == $CaseId && $this->CaseConsultationDate == $CaseConsultationDate 
-            && $this->CurrentBloodPressure == $CurrentBloodPressure && $this->CurrentWeight == $CurrentWeight 
-            && $this->CurrentSymptoms == $CurrentSymptoms && $this->CaseConsultationNotes == $CaseConsultationNotes ) {
+            if ( $this->CaseId == $CaseId && $this->CaseLabtestDate == $CaseLabtestDate 
+            && $this->CaseLabtestNotes == $CaseLabtestNotes ) {
                 $this->response['msg'] = '['.get_class($this).'] Warning: No modifications made on record';
                 return $this->response; // Return 'no modification' response
             };
             // ----------------------------------------------------------------
 
             try {
-                $SQL_Query = 'UPDATE tblCasesConsultations SET 
+                $SQL_Query = 'UPDATE tblCasesLabtests SET 
                     CaseId = :CaseId, 
-                    CaseConsultationDate = :CaseConsultationDate, 
-                    CurrentBloodPressure = :CurrentBloodPressure, 
-                    CurrentWeight = :CurrentWeight, 
-                    CurrentSymptoms = :CurrentSymptoms, 
-                    CaseConsultationNotes = :CaseConsultationNotes 
+                    CaseLabtestDate = :CaseLabtestDate, 
+                    CaseLabtestNotes = :CaseLabtestNotes 
                     WHERE 
-                    CaseConsultationId = :CaseConsultationId';
+                    CaseLabtestId = :CaseLabtestId';
                   
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
                 $this->SQL_Sentence->bindParam(':CaseId', $CaseId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CaseConsultationDate', $CaseConsultationDate, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentBloodPressure', $CurrentBloodPressure, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CurrentWeight', $CurrentWeight, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CurrentSymptoms', $CurrentSymptoms, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CaseConsultationNotes', $CaseConsultationNotes, PDO::PARAM_STR);
-                $this->SQL_Sentence->bindParam(':CaseConsultationId', $CaseConsultationId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestDate', $CaseLabtestDate, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':CaseLabtestNotes', $CaseLabtestNotes, PDO::PARAM_STR);
+                $this->SQL_Sentence->bindParam(':CaseLabtestId', $CaseLabtestId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getCaseConsultation($CaseConsultationId); // Update current object data with modified info
+                    $this->getCaseLabtest($CaseLabtestId); // Update current object data with modified info
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record updated successfully';
                 }
                 else {
@@ -254,24 +232,24 @@
         // ********************************************************************
         // (REACTIVATE) REACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function reactivateCaseConsultation( $CaseConsultationId ) {
-            $this->getCaseConsultation($CaseConsultationId); // Get current record data from DB
+        public function reactivateCaseLabtest( $CaseLabtestId ) {
+            $this->getCaseLabtest($CaseLabtestId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $CaseConsultationStatusId = 1; // Default active status (1)
+            $CaseLabtestStatusId = 1; // Default active status (1)
 
             try {
-                $SQL_Query = 'UPDATE tblCasesConsultations SET 
-                    CaseConsultationStatusId = :CaseConsultationStatusId 
+                $SQL_Query = 'UPDATE tblCasesLabtests SET 
+                    CaseLabtestStatusId = :CaseLabtestStatusId 
                     WHERE 
-                    CaseConsultationId = :CaseConsultationId';
+                    CaseLabtestId = :CaseLabtestId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':CaseConsultationStatusId', $CaseConsultationStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CaseConsultationId', $CaseConsultationId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestStatusId', $CaseLabtestStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestId', $CaseLabtestId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getCaseConsultation($CaseConsultationId); // Update current object data after reactivation
+                    $this->getCaseLabtest($CaseLabtestId); // Update current object data after reactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record reactivated successfully';
                 }
                 else {
@@ -288,24 +266,24 @@
         // ********************************************************************
         // (DEACTIVATE) DEACTIVATE RECORD ON DB *******************************
         // ********************************************************************
-        public function deactivateCaseConsultation( $CaseConsultationId ) {
-            $this->getCaseConsultation($CaseConsultationId); // Get current record data from DB
+        public function deactivateCaseLabtest( $CaseLabtestId ) {
+            $this->getCaseLabtest($CaseLabtestId); // Get current record data from DB
             $this->initResponseData(); // Reset Response Array Information
-            $CaseConsultationStatusId = 0; // Default inactive status (0)
+            $CaseLabtestStatusId = 0; // Default inactive status (0)
 
             try {
-                $SQL_Query = 'UPDATE tblCasesConsultations SET 
-                    CaseConsultationStatusId = :CaseConsultationStatusId 
+                $SQL_Query = 'UPDATE tblCasesLabtests SET 
+                    CaseLabtestStatusId = :CaseLabtestStatusId 
                     WHERE 
-                    CaseConsultationId = :CaseConsultationId';
+                    CaseLabtestId = :CaseLabtestId';
 
                 $this->SQL_Sentence = $this->DB_Connector->prepare($SQL_Query);
-                $this->SQL_Sentence->bindParam(':CaseConsultationStatusId', $CaseConsultationStatusId, PDO::PARAM_INT);
-                $this->SQL_Sentence->bindParam(':CaseConsultationId', $CaseConsultationId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestStatusId', $CaseLabtestStatusId, PDO::PARAM_INT);
+                $this->SQL_Sentence->bindParam(':CaseLabtestId', $CaseLabtestId, PDO::PARAM_INT);
                 $this->SQL_Sentence->execute();
                 
                 if ($this->SQL_Sentence->rowCount() != 0) {
-                    $this->getCaseConsultation($CaseConsultationId); // Update current object data after deactivation
+                    $this->getCaseLabtest($CaseLabtestId); // Update current object data after deactivation
                     $this->response['msg'] = '['.get_class($this).'] Ok: Record deactivated successfully';
                 }
                 else {
@@ -330,12 +308,12 @@
                 // MANUAL STATIC RESPONSE *************************************
                 $this->response['data'] = [
                     array(
-                        'CaseConsultationStatusId' => 0,
-                        'CaseConsultationStatusValue' => 'Inactive'
+                        'CaseLabtestStatusId' => 0,
+                        'CaseLabtestStatusValue' => 'Inactive'
                     ),
                     array(
-                        'CaseConsultationStatusId' => 1,
-                        'CaseConsultationStatusValue' => 'Active'
+                        'CaseLabtestStatusId' => 1,
+                        'CaseLabtestStatusValue' => 'Active'
                     )
                 ]; // Data Array to be included in the response
                 
